@@ -11,6 +11,7 @@ A package for building Go command-line applications. Inspired by Command.js.
 ## Contents
 
 - [Conventional Commits](#conventional-commits)
+- [GitHub Actions](#github-actions)
 
 ## Conventional Commits
 
@@ -29,3 +30,21 @@ pre-commit install
 ...to add a commit [Git hook](https://git-scm.com/book/en/v2/Customizing-Git-Git-Hooks) to your local machine.
 
 An automated pipeline job has been [configured](.github/workflows/build.yml) to lint commit messages on a push.
+
+## GitHub Actions
+
+A CI/CD pipeline has been created using [GitHub Actions](https://github.com/features/actions) to automated tasks such as
+linting and testing.
+
+### Build Workflow
+
+The [build](./.github/workflows/build.yml) workflow handles integration tasks. This workflow consists of two jobs, `Git`
+and `Go`, that run in parallel. This workflow is triggered on a push to a branch.
+
+#### Git
+
+This job automates tasks relating to repository linting and enforcing best practices.
+
+#### Go
+
+This job automates `Go` specific tasks.
