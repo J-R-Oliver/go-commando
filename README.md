@@ -1,5 +1,11 @@
 # go-commando
 
+[![Build](https://github.com/J-R-Oliver/go-commando/actions/workflows/build.yml/badge.svg)](https://github.com/J-R-Oliver/go-commando/actions/workflows/build.yml)
+[![GitHub go.mod Go version of a Go module](https://img.shields.io/github/go-mod/go-version/J-R-Oliver/go-commando)](https://github.com/gomods/athens)
+[![Conventional Commits](https://img.shields.io/badge/Conventional%20Commits-1.0.0-%23FE5196?logo=conventionalcommits&logoColor=white)](https://conventionalcommits.org)
+[![License: Unlicense](https://img.shields.io/badge/license-Unlicense-blue.svg)](http://unlicense.org/)
+[![Go Report Card](https://goreportcard.com/badge/github.com/J-R-Oliver/go-commando)](https://goreportcard.com/report/github.com/J-R-Oliver/go-commando)
+
 <table>
 <tr>
 <td>
@@ -10,8 +16,38 @@ A package for building Go command-line applications. Inspired by Command.js.
 
 ## Contents
 
+- [Getting Started](#getting-started)
+- [Testing](#testing)
 - [Conventional Commits](#conventional-commits)
 - [GitHub Actions](#github-actions)
+
+## Getting Started
+
+### Prerequisites
+
+To install and modify this project you will need to have:
+
+- [Go](https://go.dev)
+- [Git](https://git-scm.com)
+
+### Installation
+
+To start, please `fork` and `clone` the repository to your local machine.
+
+## Testing
+
+All tests have been written using the [testing](https://pkg.go.dev/testing) package from the
+[Standard library](https://pkg.go.dev/std). To run the tests execute:
+
+```shell
+go test -v ./...
+```
+
+Code coverage is also measured by using the `testing` package. To run tests with coverage execute:
+
+```shell
+go test -coverprofile=coverage.out  ./...
+```
 
 ## Conventional Commits
 
