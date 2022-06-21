@@ -1,17 +1,20 @@
-package commando
+// Package commando provides a succinct and simple method for creating command line applications. Primarily commando
+// wraps existing implementations in package flag.
+package commando // import "github.com/J-R-Oliver/go-commando"
 
 import (
 	"flag"
 	"fmt"
 )
 
+// Program represents a command line application.
 type Program struct {
 	name          string
 	description   string
 	version       string
 	options       []option
 	parsedOptions map[string]*string
-	action        action
+	action        Action
 }
 
 type option struct {
@@ -22,27 +25,45 @@ type option struct {
 	defaultValue string
 }
 
-type action func(arguments []string, options map[string]string)
+// Action is a type of function that receives both the arguments and options given when the application is run. Action
+// is the entry point when building command line applications using commando. arguments is a slice of strings containing
+// all user input when executing application after any options have been parsed. This slice maintains the order of the
+// inputted arguments. options is a map of strings containing options input. Specific options can be accessed using the
+// mapKey set when adding the option.
+type Action func(arguments []string, options map[string]string)
 
+// NewProgram returns a pointer to a new unconfigured program.
 func NewProgram() *Program {
 	return &Program{}
 }
 
+// Name sets the name of the program, used when creating the -h or --help output, and returns a pointer to the program.
 func (p *Program) Name(name string) *Program {
 	p.name = name
 	return p
 }
 
+// Description sets the description of the program, used when creating the -h or --help output, and returns a pointer
+// to the program.
 func (p *Program) Description(description string) *Program {
 	p.description = description
 	return p
 }
 
+// Version sets the version of the program, and returns a pointer to the program.
 func (p *Program) Version(version string) *Program {
 	p.version = version
 	return p
 }
 
+// Option adds a commandline option, and returns a pointer to the program.
+//
+// Option takes a shortOption and a longOption string. Commando will automatically add '-' for short options and '--'
+// for long options. Only short or only long options can be configured by passing "" for the unneeded variant.
+//
+// mapKey is used as the key to store the option input in the map passed to the action function.
+// description is used when creating the -h or --help output.
+// defaultValue will be set in the options map passed to the action function and be overridden by user input.
 func (p *Program) Option(shortOption, longOption, mapKey, description, defaultValue string) *Program {
 	o := option{shortOption, longOption, mapKey, description, defaultValue}
 	p.options = append(p.options, o)
@@ -50,11 +71,14 @@ func (p *Program) Option(shortOption, longOption, mapKey, description, defaultVa
 	return p
 }
 
-func (p *Program) Action(action action) *Program {
+// Action sets the action function of the program, and returns a pointer to the program.
+func (p *Program) Action(action Action) *Program {
 	p.action = action
 	return p
 }
 
+// Parse initiates starting the program and should be the final function call on program. Once the desired program
+// configuration has been loaded the action function will be called with the program arguments and options.
 func (p *Program) Parse() {
 	p.parseOptions()
 
