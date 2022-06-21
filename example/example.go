@@ -1,3 +1,5 @@
+// Example provides an example command line application built using go-commando. An action has been configured to print
+// both arguments and options to Stdout.
 package main
 
 import (
