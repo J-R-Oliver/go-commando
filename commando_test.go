@@ -44,12 +44,14 @@ func TestProgram_Version(t *testing.T) {
 func TestProgram_Option(t *testing.T) {
 	p := &Program{}
 	expected := &Program{options: []option{{
-		name:         "-t, --test-option <test>",
+		shortOption:  "t",
+		longOption:   "test-option",
+		mapKey:       "test",
 		description:  "Test option",
 		defaultValue: "Test",
 	}}}
 
-	if p = p.Option("-t, --test-option <test>", "Test option", "Test"); !reflect.DeepEqual(p, expected) {
+	if p = p.Option("t", "test-option", "test", "Test option", "Test"); !reflect.DeepEqual(p, expected) {
 		t.Errorf("Option() = %v, want %v", p, expected)
 	}
 }
@@ -86,14 +88,24 @@ func TestProgram_Parse(t *testing.T) {
 		if options["defaultOption"] != "default" {
 			t.Errorf("Parse() = %s, want %s", options["defaultOption"], "default")
 		}
+
+		if options["shortOnlyOption"] != "shortOnlyOption" {
+			t.Errorf("Parse() = %s, want %s", options["shortOnlyOption"], "shortOnlyOption")
+		}
+
+		if options["longOnlyOption"] != "longOnlyOption" {
+			t.Errorf("Parse() = %s, want %s", options["longOnlyOption"], "longOnlyOption")
+		}
 	}
 
-	os.Args = []string{"./commando_test.go", "-o", "shortOption", "--option-two", "longOption", "argument1", "argument2"}
+	os.Args = []string{"./commando_test.go", "-o", "shortOption", "--option-two", "longOption", "-s", "shortOnlyOption", "--long-option", "longOnlyOption", "argument1", "argument2"}
 
 	NewProgram().
-		Option("-o, --option-one <shortOption>", "Test option one", "default").
-		Option("-p, --option-two <longOption>", "Test option two", "default").
-		Option("-n, --option-three <defaultOption>", "Test option three", "default").
+		Option("o", "option-one", "shortOption", "Test option one", "default").
+		Option("p", "option-two", "longOption", "Test option two", "default").
+		Option("n", "option-three", "defaultOption", "Test option three", "default").
+		Option("s", "", "shortOnlyOption", "Test option four", "default").
+		Option("", "long-option", "longOnlyOption", "Test option five", "default").
 		Action(testAction).
 		Parse()
 }
@@ -108,14 +120,20 @@ func TestProgram_helpText(t *testing.T) {
 	p3 := NewProgram().Description("Test description")
 	e3 := "Usage:  [options] [arguments]\n\nTest description\n\nOptions:\n  -h, --help                              display help for command\n"
 
-	p4 := NewProgram().Option("-o, --option <option>", "Test option", "")
+	p4 := NewProgram().Option("o", "option", "option", "Test option", "")
 	e4 := "Usage:  [options] [arguments]\n\nOptions:\n  -o, --option <option>                   Test option\n  -h, --help                              display help for command\n"
 
-	p5 := NewProgram().Option("-o, --option <option>", "Test option", "default")
+	p5 := NewProgram().Option("o", "option", "option", "Test option", "default")
 	e5 := "Usage:  [options] [arguments]\n\nOptions:\n  -o, --option <option>                   Test option (default: \"default\")\n  -h, --help                              display help for command\n"
 
-	p6 := NewProgram().Version("1.0.0")
-	e6 := "Usage:  [options] [arguments]\n\nOptions:\n  -v, --version                           output the version number\n  -h, --help                              display help for command\n"
+	p6 := NewProgram().Option("o", "", "option", "Test option", "default")
+	e6 := "Usage:  [options] [arguments]\n\nOptions:\n  -o <option>                             Test option (default: \"default\")\n  -h, --help                              display help for command\n"
+
+	p7 := NewProgram().Option("", "option", "option", "Test option", "default")
+	e7 := "Usage:  [options] [arguments]\n\nOptions:\n  --option <option>                       Test option (default: \"default\")\n  -h, --help                              display help for command\n"
+
+	p8 := NewProgram().Version("1.0.0")
+	e8 := "Usage:  [options] [arguments]\n\nOptions:\n  -v, --version                           output the version number\n  -h, --help                              display help for command\n"
 
 	tests := []struct {
 		name     string
@@ -127,7 +145,9 @@ func TestProgram_helpText(t *testing.T) {
 		{"Returns help with description", p3, e3},
 		{"Returns help with option", p4, e4},
 		{"Returns help with option and default value", p5, e5},
-		{"Returns help with version", p6, e6},
+		{"Returns help with short option only", p6, e6},
+		{"Returns help with long option only", p7, e7},
+		{"Returns help with version", p8, e8},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

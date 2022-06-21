@@ -3,10 +3,7 @@ package commando
 import (
 	"flag"
 	"fmt"
-	"regexp"
 )
-
-var optionExpression = regexp.MustCompile(`\s*-{1,2}([\w\d\-]+)\s*,\s*-{1,2}([\w\d\-]+)\s*<([\w\d]+)>\s*`)
 
 type Program struct {
 	name          string
@@ -18,7 +15,9 @@ type Program struct {
 }
 
 type option struct {
-	name         string
+	shortOption  string
+	longOption   string
+	mapKey       string
 	description  string
 	defaultValue string
 }
@@ -44,8 +43,8 @@ func (p *Program) Version(version string) *Program {
 	return p
 }
 
-func (p *Program) Option(name, description, defaultValue string) *Program {
-	o := option{name, description, defaultValue}
+func (p *Program) Option(shortOption, longOption, mapKey, description, defaultValue string) *Program {
+	o := option{shortOption, longOption, mapKey, description, defaultValue}
 	p.options = append(p.options, o)
 
 	return p
@@ -74,20 +73,19 @@ func (p *Program) Parse() {
 func (p *Program) parseOptions() {
 	p.parsedOptions = make(map[string]*string)
 
-	for _, option := range p.options {
+	for _, o := range p.options {
 		s := new(string)
 
-		name, longOption, value := parseOptionName(option.name)
+		if o.shortOption != "" {
+			flag.StringVar(s, o.shortOption, o.defaultValue, o.description)
+		}
 
-		flag.StringVar(s, name, option.defaultValue, option.description)
-		flag.StringVar(s, longOption, option.defaultValue, option.description)
-		p.parsedOptions[value] = s
+		if o.longOption != "" {
+			flag.StringVar(s, o.longOption, o.defaultValue, o.description)
+		}
+
+		p.parsedOptions[o.mapKey] = s
 	}
-}
-
-func parseOptionName(n string) (shortOption, longOption, value string) {
-	s := optionExpression.FindStringSubmatch(n)
-	return s[1], s[2], s[3]
 }
 
 func (p *Program) helpText() string {
@@ -100,7 +98,9 @@ func (p *Program) helpText() string {
 	h += "\nOptions:\n"
 
 	for _, o := range p.options {
-		h += fmt.Sprintf("  %-40s%s", o.name, o.description)
+		n := p.helpTextOptionName(o)
+
+		h += fmt.Sprintf("  %-40s%s", n, o.description)
 
 		if o.defaultValue != "" {
 			h += fmt.Sprintf(" (default: \"%s\")\n", o.defaultValue)
@@ -116,6 +116,25 @@ func (p *Program) helpText() string {
 	h += fmt.Sprintf("  %-40s%s\n", "-h, --help", "display help for command")
 
 	return h
+}
+
+func (p *Program) helpTextOptionName(o option) string {
+	var n string
+	if o.shortOption != "" {
+		n += fmt.Sprintf("-%s", o.shortOption)
+	}
+
+	if o.shortOption != "" && o.longOption != "" {
+		n += ", "
+	}
+
+	if o.longOption != "" {
+		n += fmt.Sprintf("--%s", o.longOption)
+	}
+
+	n += fmt.Sprintf(" <%s>", o.mapKey)
+
+	return n
 }
 
 func (p *Program) dereferenceParsedOptionsMap() map[string]string {
