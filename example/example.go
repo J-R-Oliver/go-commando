@@ -25,7 +25,7 @@ func main() {
 
 	program.
 		Name("file-splitter").
-		Description("CLI to split file written in go").
+		Description("CLI to split file written in go.").
 		Version("1.0.0").
 		Option("-i, --input <input>", "Input file", "./input.txt").
 		Option("-o, --output <output>", "Output file", "./output.txt").
