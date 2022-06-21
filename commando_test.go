@@ -97,3 +97,45 @@ func TestProgram_Parse(t *testing.T) {
 		Action(testAction).
 		Parse()
 }
+
+func TestProgram_helpText(t *testing.T) {
+	p1 := NewProgram()
+	e1 := "Usage:  [options] [arguments]\n\nOptions:\n  -h, --help                              display help for command\n"
+
+	p2 := NewProgram().Name("Test command")
+	e2 := "Usage: Test command [options] [arguments]\n\nOptions:\n  -h, --help                              display help for command\n"
+
+	p3 := NewProgram().Description("Test description")
+	e3 := "Usage:  [options] [arguments]\n\nTest description\n\nOptions:\n  -h, --help                              display help for command\n"
+
+	p4 := NewProgram().Option("-o, --option <option>", "Test option", "")
+	e4 := "Usage:  [options] [arguments]\n\nOptions:\n  -o, --option <option>                   Test option\n  -h, --help                              display help for command\n"
+
+	p5 := NewProgram().Option("-o, --option <option>", "Test option", "default")
+	e5 := "Usage:  [options] [arguments]\n\nOptions:\n  -o, --option <option>                   Test option (default: \"default\")\n  -h, --help                              display help for command\n"
+
+	p6 := NewProgram().Version("1.0.0")
+	e6 := "Usage:  [options] [arguments]\n\nOptions:\n  -v, --version                           output the version number\n  -h, --help                              display help for command\n"
+
+	tests := []struct {
+		name     string
+		program  *Program
+		expected string
+	}{
+		{"Returns minimal help", p1, e1},
+		{"Returns help with command name", p2, e2},
+		{"Returns help with description", p3, e3},
+		{"Returns help with option", p4, e4},
+		{"Returns help with option and default value", p5, e5},
+		{"Returns help with version", p6, e6},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			h := tt.program.helpText()
+
+			if h != tt.expected {
+				t.Errorf("help():\nGot:\n%sWant:\n%s", h, tt.expected)
+			}
+		})
+	}
+}
