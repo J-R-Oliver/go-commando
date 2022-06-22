@@ -5,6 +5,7 @@ package commando // import "github.com/J-R-Oliver/go-commando"
 import (
 	"flag"
 	"fmt"
+	"os"
 )
 
 // Program represents a command line application.
@@ -15,6 +16,7 @@ type Program struct {
 	options       []option
 	parsedOptions map[string]*string
 	action        Action
+	showVersion   *bool
 }
 
 type option struct {
@@ -50,7 +52,8 @@ func (p *Program) Description(description string) *Program {
 	return p
 }
 
-// Version sets the version of the program, and returns a pointer to the program.
+// Version sets the version of the program, returned when the application is called with -v or --version, and returns a
+// pointer to the program.
 func (p *Program) Version(version string) *Program {
 	p.version = version
 	return p
@@ -81,6 +84,7 @@ func (p *Program) Action(action Action) *Program {
 // configuration has been loaded the action function will be called with the program arguments and options.
 func (p *Program) Parse() {
 	p.parseOptions()
+	p.addVersionOption()
 
 	// Using an anonymous function to help with the testing of helpText
 	flag.Usage = func() {
@@ -88,6 +92,11 @@ func (p *Program) Parse() {
 	}
 
 	flag.Parse()
+
+	if *p.showVersion {
+		fmt.Println(p.version)
+		os.Exit(0)
+	}
 
 	o := p.dereferenceParsedOptionsMap()
 
@@ -110,6 +119,15 @@ func (p *Program) parseOptions() {
 
 		p.parsedOptions[o.mapKey] = s
 	}
+}
+
+func (p *Program) addVersionOption() {
+	v := new(bool)
+
+	flag.BoolVar(v, "v", false, "Show program version")
+	flag.BoolVar(v, "version", false, "Show program version")
+
+	p.showVersion = v
 }
 
 func (p *Program) helpText() string {
