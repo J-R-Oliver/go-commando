@@ -39,13 +39,17 @@ jobs:
     name: Go
     runs-on: ubuntu-latest
 
+    strategy:
+      matrix:
+        go: [ '1.14', '1.18' ]
+
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v3
-      - name: Setup Go
+      - name: Setup Go - ${{ matrix.go }}
         uses: actions/setup-go@v3
         with:
-          go-version-file: go.mod
+          go-version: ${{ matrix.go }}
       - name: Cache Go modules
         id: cache-go-modules
         uses: actions/cache@v3
