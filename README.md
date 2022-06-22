@@ -2,6 +2,7 @@
 
 [![Build](https://github.com/J-R-Oliver/go-commando/actions/workflows/build.yml/badge.svg)](https://github.com/J-R-Oliver/go-commando/actions/workflows/build.yml)
 [![GitHub go.mod Go version of a Go module](https://img.shields.io/github/go-mod/go-version/J-R-Oliver/go-commando)](https://github.com/gomods/athens)
+[![GitHub release (latest SemVer)](https://img.shields.io/github/v/release/J-R-Oliver/go-commando)](https://github.com/J-R-Oliver/go-commando/releases)
 [![Conventional Commits](https://img.shields.io/badge/Conventional%20Commits-1.0.0-%23FE5196?logo=conventionalcommits&logoColor=white)](https://conventionalcommits.org)
 [![License: Unlicense](https://img.shields.io/badge/license-Unlicense-blue.svg)](http://unlicense.org/)
 [![Go Report Card](https://goreportcard.com/badge/github.com/J-R-Oliver/go-commando)](https://goreportcard.com/report/github.com/J-R-Oliver/go-commando)
@@ -249,3 +250,14 @@ This job automates tasks relating to repository linting and enforcing best pract
 #### Go
 
 This job automates `Go` specific tasks.
+
+### Release Workflow
+
+The [release](./.github/workflows/release.yml) workflow handles release tasks. This workflow consists of one job, 
+`Go Release`. This workflow is triggered manually from the 
+[GitHub Actions UI](https://github.com/J-R-Oliver/go-commando/actions).
+
+#### Go Release
+
+This job automates tasks relating to updating [changelog](./CHANGELOG.md), and publishing 
+[GitHub release](https://github.com/J-R-Oliver/go-commando/releases).
